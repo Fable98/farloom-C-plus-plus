@@ -1,0 +1,21 @@
+# Build artifacts
+build/
+bin/
+*.o
+*.obj
+*.d
+*.a
+*.dylib
+*.so
+*.exe
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary and test outputs
+tests/tmp/
