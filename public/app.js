@@ -1,117 +1,149 @@
-// Farloom C++20 Control Plane Dashboard
+// FARLOOM C++20 PIXEL UI CONTROLLER
 document.addEventListener("DOMContentLoaded", () => {
-  // Tab Switching
-  const tabBtns = document.querySelectorAll(".tab-btn");
-  const tabContents = document.querySelectorAll(".tab-content");
+  // Navigation Tabs
+  const tabBtns = document.querySelectorAll(".pixel-tab-btn");
+  const tabPanels = document.querySelectorAll(".tab-panel");
+
+  function switchTab(targetId) {
+    tabBtns.forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.tab === targetId);
+    });
+    tabPanels.forEach(panel => {
+      panel.classList.toggle("active", panel.id === targetId);
+    });
+  }
 
   tabBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const tabTarget = btn.getAttribute("data-tab");
-      
-      tabBtns.forEach(b => b.classList.remove("active"));
-      tabContents.forEach(c => c.classList.remove("active"));
-      
-      btn.classList.add("active");
-      const targetElement = document.getElementById(tabTarget);
-      if (targetElement) {
-        targetElement.classList.add("active");
-      }
-    });
+    btn.addEventListener("click", () => switchTab(btn.dataset.tab));
   });
 
-  // Heartbeat Monitor
-  const statusDot = document.getElementById("status-dot");
-  const pingStat = document.getElementById("ping-stat");
-  const uptimePingsEl = document.getElementById("metric-pings");
-  const liveLatencyEl = document.getElementById("metric-latency");
-  const requestsSentEl = document.getElementById("metric-requests");
-  
-  let totalPings = 0;
-  let totalBrowserRequests = 0;
+  document.querySelectorAll(".nav-link").forEach(link => {
+    link.addEventListener("click", () => switchTab(link.dataset.tab));
+  });
 
-  async function checkHeartbeat() {
-    const start = performance.now();
+  // Telemetry Heartbeat & Auto-Poll Toggle
+  const pingStat = document.getElementById("ping-stat");
+  const serverStateBadge = document.getElementById("server-state-badge");
+  const metricPingVal = document.getElementById("metric-ping-val");
+  const metricPingsCount = document.getElementById("metric-pings-count");
+  const metricReqsCount = document.getElementById("metric-reqs-count");
+  const telemetryToggle = document.getElementById("telemetry-toggle");
+  const telemetryToggleLabel = document.getElementById("telemetry-toggle-label");
+
+  let isAutoPoll = true;
+  let totalPings = 0;
+  let totalRequests = 0;
+  let pollInterval = null;
+
+  async function pingServer() {
+    const t0 = performance.now();
     try {
       const res = await fetch("/health", { cache: "no-store" });
-      const duration = Math.round(performance.now() - start);
+      const elapsed = Math.round(performance.now() - t0);
       if (res.ok) {
-        statusDot.className = "status-dot";
-        pingStat.textContent = `${duration} ms`;
-        if (liveLatencyEl) liveLatencyEl.textContent = `${duration} ms`;
+        pingStat.textContent = `${elapsed} ms`;
+        if (metricPingVal) metricPingVal.textContent = `${elapsed} ms`;
+        serverStateBadge.textContent = "ONLINE";
+        serverStateBadge.className = "pixel-badge pixel-badge-green";
         totalPings++;
-        if (uptimePingsEl) uptimePingsEl.textContent = totalPings;
+        if (metricPingsCount) metricPingsCount.textContent = totalPings;
       } else {
-        throw new Error("Bad status");
+        throw new Error("HTTP error " + res.status);
       }
-    } catch (err) {
-      statusDot.className = "status-dot offline";
-      pingStat.textContent = "Offline";
-      if (liveLatencyEl) liveLatencyEl.textContent = "--";
+    } catch (_) {
+      pingStat.textContent = "OFFLINE";
+      if (metricPingVal) metricPingVal.textContent = "OFFLINE";
+      serverStateBadge.textContent = "DISCONNECTED";
+      serverStateBadge.className = "pixel-badge pixel-badge-red";
     }
   }
 
-  // Initial check and periodic polling
-  checkHeartbeat();
-  setInterval(checkHeartbeat, 2500);
+  function startAutoPoll() {
+    pingServer();
+    pollInterval = setInterval(pingServer, 2000);
+  }
 
-  // API Playground Logic
+  function stopAutoPoll() {
+    if (pollInterval) clearInterval(pollInterval);
+    pollInterval = null;
+  }
+
+  startAutoPoll();
+
+  if (telemetryToggle) {
+    telemetryToggle.addEventListener("click", () => {
+      isAutoPoll = !isAutoPoll;
+      telemetryToggle.classList.toggle("off", !isAutoPoll);
+      telemetryToggleLabel.textContent = isAutoPoll ? "ON" : "OFF";
+      if (isAutoPoll) {
+        startAutoPoll();
+      } else {
+        stopAutoPoll();
+      }
+    });
+  }
+
+  // Notice Dialog Buttons
+  const noticeYesBtn = document.getElementById("notice-yes-btn");
+  const noticeNoBtn = document.getElementById("notice-no-btn");
+  if (noticeYesBtn) {
+    noticeYesBtn.addEventListener("click", () => {
+      pingServer();
+      noticeYesBtn.textContent = "Checked!";
+      setTimeout(() => noticeYesBtn.textContent = "Yes", 1200);
+    });
+  }
+  if (noticeNoBtn) {
+    noticeNoBtn.addEventListener("click", () => {
+      switchTab("tab-api");
+    });
+  }
+
+  // File Explorer Click to Inspect
+  document.querySelectorAll(".file-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      const path = chip.dataset.file;
+      switchTab("tab-api");
+      document.getElementById("api-method").value = "GET";
+      document.getElementById("api-path").value = path;
+      document.getElementById("api-headers").value = "";
+      document.getElementById("api-body").value = "";
+      executeApi();
+    });
+  });
+
+  // API Console
   const apiMethod = document.getElementById("api-method");
   const apiPath = document.getElementById("api-path");
   const apiHeaders = document.getElementById("api-headers");
   const apiBody = document.getElementById("api-body");
   const apiSendBtn = document.getElementById("api-send-btn");
-  const resStatus = document.getElementById("res-status");
-  const resTime = document.getElementById("res-time");
-  const resHeaders = document.getElementById("res-headers");
-  const resBody = document.getElementById("res-body");
-  const copyResBtn = document.getElementById("copy-res-btn");
+  const apiClearBtn = document.getElementById("api-clear-btn");
+  const apiStatusBadge = document.getElementById("api-status-badge");
+  const apiTimeStat = document.getElementById("api-time-stat");
+  const apiTerminal = document.getElementById("api-terminal");
+  const copyTerminalBtn = document.getElementById("copy-terminal-btn");
 
   const presets = {
-    health: {
-      method: "GET",
-      path: "/health",
-      headers: "",
-      body: ""
+    health: { method: "GET", path: "/health", headers: "", body: "" },
+    echoJson: { 
+      method: "POST", 
+      path: "/api/echo", 
+      headers: "Content-Type: application/json\nX-Client: Farloom-PixelUI", 
+      body: JSON.stringify({ message: "Hello Farloom Retro Pixel OS", timestamp: Date.now() }, null, 2) 
     },
-    echoJson: {
-      method: "POST",
-      path: "/api/echo",
-      headers: "Content-Type: application/json\nX-Client: Farloom-Dashboard",
-      body: JSON.stringify({ message: "Hello Farloom C++20!", timestamp: new Date().toISOString() }, null, 2)
+    echoText: { 
+      method: "POST", 
+      path: "/api/echo", 
+      headers: "Content-Type: text/plain", 
+      body: "Pixel UI 16-Color Retro C++20 Web Server" 
     },
-    echoText: {
-      method: "POST",
-      path: "/api/echo",
-      headers: "Content-Type: text/plain",
-      body: "High-performance POSIX C++20 HTTP/1.1 Web Server"
-    },
-    staticIndex: {
-      method: "GET",
-      path: "/index.html",
-      headers: "",
-      body: ""
-    },
-    staticCss: {
-      method: "GET",
-      path: "/style.css",
-      headers: "",
-      body: ""
-    },
-    traversalCheck: {
-      method: "GET",
-      path: "/..%2fCMakeLists.txt",
-      headers: "",
-      body: ""
-    },
-    notAllowed: {
-      method: "DELETE",
-      path: "/health",
-      headers: "",
-      body: ""
-    }
+    static: { method: "GET", path: "/index.html", headers: "", body: "" },
+    traversal: { method: "GET", path: "/..%2fCMakeLists.txt", headers: "", body: "" },
+    method405: { method: "DELETE", path: "/health", headers: "", body: "" }
   };
 
-  document.querySelectorAll(".preset-chip").forEach(chip => {
+  document.querySelectorAll(".pixel-chip").forEach(chip => {
     chip.addEventListener("click", () => {
       const p = presets[chip.dataset.preset];
       if (p) {
@@ -123,13 +155,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  async function executeApiRequest() {
+  async function executeApi() {
     apiSendBtn.disabled = true;
     apiSendBtn.textContent = "Sending...";
-    totalBrowserRequests++;
-    if (requestsSentEl) requestsSentEl.textContent = totalBrowserRequests;
+    totalRequests++;
+    if (metricReqsCount) metricReqsCount.textContent = totalRequests;
 
-    const method = apiMethod.value.trim().toUpperCase();
+    const method = apiMethod.value;
     const path = apiPath.value.trim() || "/";
     const headerLines = apiHeaders.value.split("\n");
     const headers = {};
@@ -143,258 +175,253 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    const options = {
-      method: method,
-      headers: headers
-    };
-
+    const options = { method, headers };
     if (method !== "GET" && method !== "HEAD" && apiBody.value.trim()) {
       options.body = apiBody.value;
     }
 
     const t0 = performance.now();
     try {
-      const response = await fetch(path, options);
-      const elapsed = (performance.now() - t0).toFixed(2);
-      
-      // Update Status Badge
-      resStatus.textContent = `${response.status} ${response.statusText || ""}`;
-      resStatus.className = "status-badge";
-      if (response.status >= 200 && response.status < 300) {
-        resStatus.classList.add("status-200");
-      } else if (response.status === 400 || response.status === 413) {
-        resStatus.classList.add("status-400");
-      } else if (response.status === 404) {
-        resStatus.classList.add("status-404");
-      } else if (response.status === 405) {
-        resStatus.classList.add("status-405");
-      } else if (response.status === 503) {
-        resStatus.classList.add("status-503");
+      const res = await fetch(path, options);
+      const elapsed = Math.round(performance.now() - t0);
+      apiTimeStat.textContent = `${elapsed} ms`;
+
+      // Status badge styling
+      apiStatusBadge.textContent = `Status: ${res.status} ${res.statusText || ""}`;
+      if (res.status === 200) {
+        apiStatusBadge.className = "pixel-badge pixel-badge-green";
+      } else if (res.status === 503) {
+        apiStatusBadge.className = "pixel-badge pixel-badge-red";
+      } else if (res.status === 404 || res.status === 405) {
+        apiStatusBadge.className = "pixel-badge pixel-badge-yellow";
       } else {
-        resStatus.classList.add("status-400");
+        apiStatusBadge.className = "pixel-badge pixel-badge-blue";
       }
 
-      resTime.textContent = `${elapsed} ms`;
-
-      // Extract Headers
+      // Headers string
       const respHeaders = [];
-      response.headers.forEach((val, key) => {
-        respHeaders.push(`${key}: ${val}`);
-      });
-      resHeaders.textContent = respHeaders.join("\n") || "(No headers received)";
+      res.headers.forEach((v, k) => respHeaders.push(`${k}: ${v}`));
+      
+      let bodyText = await res.text();
+      try {
+        const parsed = JSON.parse(bodyText);
+        bodyText = JSON.stringify(parsed, null, 2);
+      } catch (_) {}
 
-      // Extract Body
-      const contentType = response.headers.get("content-type") || "";
-      let bodyText = await response.text();
-      if (contentType.includes("application/json")) {
-        try {
-          bodyText = JSON.stringify(JSON.parse(bodyText), null, 2);
-        } catch (_) {}
-      }
-      resBody.textContent = bodyText || "(Empty response body)";
+      apiTerminal.textContent = 
+`HTTP/1.1 ${res.status} ${res.statusText || 'OK'}
+${respHeaders.join('\n')}
+
+${bodyText}`;
+
     } catch (err) {
-      const elapsed = (performance.now() - t0).toFixed(2);
-      resStatus.textContent = "Error";
-      resStatus.className = "status-badge status-405";
-      resTime.textContent = `${elapsed} ms`;
-      resHeaders.textContent = "(Network connection failed or connection closed)";
-      resBody.textContent = `Error: ${err.message}`;
+      const elapsed = Math.round(performance.now() - t0);
+      apiTimeStat.textContent = `${elapsed} ms`;
+      apiStatusBadge.textContent = "Status: Connection Error";
+      apiStatusBadge.className = "pixel-badge pixel-badge-red";
+      apiTerminal.textContent = `Error connecting to Farloom server: ${err.message}`;
     } finally {
       apiSendBtn.disabled = false;
-      apiSendBtn.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-        </svg> Send Request
-      `;
+      apiSendBtn.textContent = "Send Request (Ctrl+Enter)";
     }
   }
 
-  apiSendBtn.addEventListener("click", executeApiRequest);
+  apiSendBtn.addEventListener("click", executeApi);
 
-  // Keyboard shortcut: Cmd/Ctrl + Enter in body or path
+  // Keyboard shortcut Ctrl/Cmd + Enter
   [apiPath, apiHeaders, apiBody].forEach(el => {
-    el.addEventListener("keydown", (e) => {
+    el.addEventListener("keydown", e => {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
         e.preventDefault();
-        executeApiRequest();
+        executeApi();
       }
     });
   });
 
-  if (copyResBtn) {
-    copyResBtn.addEventListener("click", () => {
-      navigator.clipboard.writeText(resBody.textContent).then(() => {
-        const orig = copyResBtn.textContent;
-        copyResBtn.textContent = "Copied!";
-        setTimeout(() => copyResBtn.textContent = orig, 1500);
+  if (apiClearBtn) {
+    apiClearBtn.addEventListener("click", () => {
+      apiMethod.value = "GET";
+      apiPath.value = "/health";
+      apiHeaders.value = "";
+      apiBody.value = "";
+      apiTerminal.textContent = "Cleared.";
+      apiStatusBadge.textContent = "Status: Ready";
+      apiStatusBadge.className = "pixel-badge pixel-badge-blue";
+    });
+  }
+
+  if (copyTerminalBtn) {
+    copyTerminalBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(apiTerminal.textContent).then(() => {
+        copyTerminalBtn.textContent = "Copied!";
+        setTimeout(() => copyTerminalBtn.textContent = "Copy Output", 1200);
       });
     });
   }
 
-  // Concurrency Stress Tester Logic
-  const stressBatchSize = document.getElementById("stress-batch-size");
-  const stressConcurrency = document.getElementById("stress-concurrency");
-  const stressTarget = document.getElementById("stress-target");
+  // Segmented Progress Bar & Stress Tester
+  const stressReqSelect = document.getElementById("stress-requests-select");
+  const stressConcSelect = document.getElementById("stress-concurrency-select");
   const stressStartBtn = document.getElementById("stress-start-btn");
-  const stressProgress = document.getElementById("stress-progress");
-  const stressTotal = document.getElementById("stress-total");
+  const stressProgressBar = document.getElementById("pixel-progress-bar");
+  const stressProgressCount = document.getElementById("stress-progress-count");
+  const stressPct = document.getElementById("stress-pct");
   const stress200 = document.getElementById("stress-200");
   const stress503 = document.getElementById("stress-503");
-  const stressErrors = document.getElementById("stress-errors");
-  const stressTps = document.getElementById("stress-tps");
-  const stressAvg = document.getElementById("stress-avg");
-  const stressP95 = document.getElementById("stress-p95");
-  const latencyBars = document.getElementById("latency-distribution-bars");
+  const stressThroughput = document.getElementById("stress-throughput");
+  const stressAvgLat = document.getElementById("stress-avg-lat");
 
-  let isStressRunning = false;
+  let isStressActive = false;
 
-  async function runStressTest() {
-    if (isStressRunning) return;
-    isStressRunning = true;
+  function updateSegmentedBar(percent) {
+    stressPct.textContent = `${percent}%`;
+    // Calculate how many 12px segments fit
+    const totalSlots = Math.floor(stressProgressBar.clientWidth / 12) || 25;
+    const activeSegments = Math.round((percent / 100) * totalSlots);
+    
+    stressProgressBar.innerHTML = "";
+    for (let i = 0; i < activeSegments; i++) {
+      const seg = document.createElement("div");
+      seg.className = "pixel-progress-segment";
+      stressProgressBar.appendChild(seg);
+    }
+  }
+
+  async function runStress() {
+    if (isStressActive) return;
+    isStressActive = true;
     stressStartBtn.disabled = true;
-    stressStartBtn.textContent = "Running Benchmark...";
+    stressStartBtn.textContent = "Benchmarking...";
 
-    const total = parseInt(stressBatchSize.value, 10) || 50;
-    const concurrency = parseInt(stressConcurrency.value, 10) || 8;
-    const url = stressTarget.value.trim() || "/health";
+    const total = parseInt(stressReqSelect.value, 10);
+    const concurrency = parseInt(stressConcSelect.value, 10);
 
     let completed = 0;
-    let count200 = 0;
-    let count503 = 0;
-    let countErr = 0;
+    let ok200 = 0;
+    let shed503 = 0;
     const latencies = [];
 
-    stressProgress.style.width = "0%";
-    stressTotal.textContent = `0 / ${total}`;
+    updateSegmentedBar(0);
+    stressProgressCount.textContent = `0 / ${total}`;
     stress200.textContent = "0";
     stress503.textContent = "0";
-    stressErrors.textContent = "0";
-    stressTps.textContent = "--";
-    stressAvg.textContent = "--";
-    stressP95.textContent = "--";
-    latencyBars.innerHTML = "";
+    stressThroughput.textContent = "--";
+    stressAvgLat.textContent = "--";
 
     const tStart = performance.now();
+    let index = 0;
 
-    let currentIndex = 0;
-
-    async function worker() {
-      while (currentIndex < total) {
-        const idx = currentIndex++;
+    async function stressWorker() {
+      while (index < total) {
+        index++;
         const t0 = performance.now();
         try {
-          const res = await fetch(url, { cache: "no-store" });
+          const res = await fetch("/health", { cache: "no-store" });
           const lat = performance.now() - t0;
           latencies.push(lat);
-          if (res.status === 200) count200++;
-          else if (res.status === 503) count503++;
-          else countErr++;
+          if (res.status === 200) ok200++;
+          else if (res.status === 503) shed503++;
         } catch (_) {
-          const lat = performance.now() - t0;
-          latencies.push(lat);
-          countErr++;
+          latencies.push(performance.now() - t0);
         }
         completed++;
-        totalBrowserRequests++;
-        
-        // Progress UI update
+        totalRequests++;
+
         const pct = Math.round((completed / total) * 100);
-        stressProgress.style.width = `${pct}%`;
-        stressTotal.textContent = `${completed} / ${total}`;
-        stress200.textContent = count200;
-        stress503.textContent = count503;
-        stressErrors.textContent = countErr;
+        updateSegmentedBar(pct);
+        stressProgressCount.textContent = `${completed} / ${total}`;
+        stress200.textContent = ok200;
+        stress503.textContent = shed503;
       }
     }
 
     const workers = [];
     for (let i = 0; i < concurrency; i++) {
-      workers.push(worker());
+      workers.push(stressWorker());
     }
     await Promise.all(workers);
 
-    const totalElapsedSec = (performance.now() - tStart) / 1000;
-    const throughput = (total / totalElapsedSec).toFixed(1);
-    latencies.sort((a, b) => a - b);
-    const avg = (latencies.reduce((a, b) => a + b, 0) / latencies.length).toFixed(2);
-    const p95Idx = Math.floor(latencies.length * 0.95);
-    const p95 = latencies[p95Idx].toFixed(2);
+    const elapsedSec = (performance.now() - tStart) / 1000;
+    const tps = (total / elapsedSec).toFixed(1);
+    const avg = (latencies.reduce((a, b) => a + b, 0) / (latencies.length || 1)).toFixed(1);
 
-    stressTps.textContent = `${throughput} req/s`;
-    stressAvg.textContent = `${avg} ms`;
-    stressP95.textContent = `${p95} ms`;
-    if (requestsSentEl) requestsSentEl.textContent = totalBrowserRequests;
+    stressThroughput.textContent = `${tps} req/s`;
+    stressAvgLat.textContent = `${avg} ms`;
+    if (metricReqsCount) metricReqsCount.textContent = totalRequests;
 
-    // Render Histogram of latencies
-    renderLatencyHistogram(latencies);
-
-    isStressRunning = false;
+    isStressActive = false;
     stressStartBtn.disabled = false;
-    stressStartBtn.textContent = "Start Concurrency Test";
-  }
-
-  function renderLatencyHistogram(lats) {
-    if (!lats.length) return;
-    const min = lats[0];
-    const max = lats[lats.length - 1];
-    const buckets = 8;
-    const bucketCounts = new Array(buckets).fill(0);
-    const step = (max - min) / buckets || 1;
-
-    lats.forEach(l => {
-      let b = Math.floor((l - min) / step);
-      if (b >= buckets) b = buckets - 1;
-      bucketCounts[b]++;
-    });
-
-    const maxCount = Math.max(...bucketCounts, 1);
-    latencyBars.innerHTML = "";
-
-    bucketCounts.forEach((count, i) => {
-      const barWrapper = document.createElement("div");
-      barWrapper.style.cssText = "display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1;";
-      
-      const barHeight = Math.max(6, Math.round((count / maxCount) * 80));
-      const rangeStart = (min + i * step).toFixed(1);
-      
-      barWrapper.innerHTML = `
-        <span style="font-size: 10px; color: var(--text-muted);">${count}</span>
-        <div style="width: 100%; height: ${barHeight}px; background: linear-gradient(180deg, var(--accent-cyan), var(--accent-indigo)); border-radius: 4px;"></div>
-        <span style="font-size: 9px; color: var(--text-secondary); font-family: var(--font-mono);">${rangeStart}ms</span>
-      `;
-      latencyBars.appendChild(barWrapper);
-    });
+    stressStartBtn.textContent = "Start Benchmark";
   }
 
   if (stressStartBtn) {
-    stressStartBtn.addEventListener("click", runStressTest);
+    stressStartBtn.addEventListener("click", runStress);
   }
 
-  // Security Test Buttons
-  document.querySelectorAll(".test-security-btn").forEach(btn => {
+  // Security Lab Attack Buttons
+  document.querySelectorAll(".test-attack-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
       const path = btn.dataset.path;
       const method = btn.dataset.method || "GET";
-      const targetLabel = btn.nextElementSibling;
-      
+      const resultBadge = btn.nextElementSibling;
+
       btn.disabled = true;
       btn.textContent = "Testing...";
 
       const t0 = performance.now();
       try {
         const res = await fetch(path, { method: method });
-        const dur = (performance.now() - t0).toFixed(1);
-        if (targetLabel) {
-          targetLabel.innerHTML = `<span class="status-badge ${res.status === 404 ? 'status-404' : res.status === 405 ? 'status-405' : 'status-400'}">Status: ${res.status} (${dur}ms)</span> - Defended!`;
+        const dur = Math.round(performance.now() - t0);
+        if (res.status === 404) {
+          resultBadge.textContent = `404 Defended (${dur}ms)`;
+          resultBadge.className = "attack-result pixel-badge pixel-badge-green";
+        } else if (res.status === 405) {
+          resultBadge.textContent = `405 Blocked (${dur}ms)`;
+          resultBadge.className = "attack-result pixel-badge pixel-badge-blue";
+        } else {
+          resultBadge.textContent = `Status: ${res.status}`;
+          resultBadge.className = "attack-result pixel-badge pixel-badge-yellow";
         }
       } catch (err) {
-        if (targetLabel) {
-          targetLabel.innerHTML = `<span class="status-badge status-200">Mitigated: Connection Closed</span>`;
-        }
+        resultBadge.textContent = "Mitigated (Closed)";
+        resultBadge.className = "attack-result pixel-badge pixel-badge-green";
       } finally {
         btn.disabled = false;
-        btn.textContent = "Run Test";
+        btn.textContent = "Test";
       }
     });
   });
+
+  // Menu bar quick actions
+  const menuNewReq = document.getElementById("menu-new-req");
+  if (menuNewReq) {
+    menuNewReq.addEventListener("click", () => {
+      switchTab("tab-api");
+      apiPath.focus();
+    });
+  }
+
+  const menuCopyRes = document.getElementById("menu-copy-res");
+  if (menuCopyRes && copyTerminalBtn) {
+    menuCopyRes.addEventListener("click", () => copyTerminalBtn.click());
+  }
+
+  const menuClearAll = document.getElementById("menu-clear-all");
+  if (menuClearAll && apiClearBtn) {
+    menuClearAll.addEventListener("click", () => apiClearBtn.click());
+  }
+
+  const menuAbout = document.getElementById("menu-about");
+  if (menuAbout) {
+    menuAbout.addEventListener("click", () => {
+      alert("FARLOOM C++20 - Retro Pixel UI Edition\nA multithreaded HTTP/1.1 server built with POSIX sockets, std::thread, and bounded queue.\nTemplate inspired by classic 16-color Retro Pixel UI.");
+    });
+  }
+
+  const menuDocs = document.getElementById("menu-docs");
+  if (menuDocs) {
+    menuDocs.addEventListener("click", () => {
+      window.open("https://github.com/Fable98/farloom-C-plus-plus#readme", "_blank");
+    });
+  }
 });

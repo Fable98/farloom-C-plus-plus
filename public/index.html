@@ -3,452 +3,541 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Farloom C++20 | Multithreaded HTTP/1.1 Web Server</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2306b6d4'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+  <title>FARLOOM C++20 | PIXEL UI EDITION</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'><rect width='16' height='16' fill='%232458c8'/><rect x='3' y='3' width='10' height='10' fill='%23ffffff'/><rect x='5' y='5' width='6' height='6' fill='%232458c8'/></svg>">
   <link rel="stylesheet" href="/style.css">
   <script defer src="/app.js"></script>
 </head>
 <body>
 
-  <!-- Top Navigation Bar -->
-  <header class="navbar">
-    <a href="/" class="brand">
-      <div class="brand-icon">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+  <!-- Top Header Banner -->
+  <header class="pixel-header">
+    <div class="pixel-logo-group">
+      <div class="pixel-logo-icon">
+        <svg width="24" height="24" viewBox="0 0 16 16" shape-rendering="crispEdges">
+          <path d="M2 2h12v12H2z" fill="#163c96"/>
+          <path d="M4 4h8v2H4zm0 3h8v2H4zm0 3h5v2H4z" fill="#ffffff"/>
         </svg>
       </div>
-      <div class="brand-info">
-        <h1>Farloom <span class="badge-lang">C++20</span></h1>
-        <p>POSIX Sockets · Bounded Queue · Fixed Worker Pool</p>
+      <div class="pixel-logo-title">
+        <h1>PIXEL UI <span style="font-size: 0.9rem; background: #000; color: #fff; padding: 2px 6px; margin-left: 6px;">FARLOOM C++20</span></h1>
+        <div class="pixel-subtitle">RETRO OS WORKSTATION · POSIX THREAD POOL · BOUNDED QUEUE</div>
       </div>
-    </a>
+    </div>
 
-    <div class="header-status">
-      <div class="server-pill">
-        <span id="status-dot" class="status-dot"></span>
-        <span>127.0.0.1:7878</span>
-        <span class="ping-stat" id="ping-stat">-- ms</span>
-      </div>
-
-      <nav class="tabs-nav">
-        <button class="tab-btn active" data-tab="tab-overview">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
-          </svg> Overview
-        </button>
-        <button class="tab-btn" data-tab="tab-playground">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-          </svg> API Console
-        </button>
-        <button class="tab-btn" data-tab="tab-stress">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M13 2.05v3.03c3.39.49 6 3.39 6 6.92 0 .9-.18 1.75-.48 2.54l2.6 1.53c.56-1.24.88-2.62.88-4.07 0-5.18-3.95-9.45-9-9.95zM12 19c-3.87 0-7-3.13-7-7 0-3.53 2.61-6.43 6-6.92V2.05c-5.06.5-9 4.76-9 9.95 0 5.52 4.47 10 9.99 10 3.31 0 6.24-1.61 8.01-4.09l-2.45-1.44C15.42 18.06 13.82 19 12 19z"/>
-          </svg> Stress Test
-        </button>
-        <button class="tab-btn" data-tab="tab-security">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
-          </svg> Security Lab
-        </button>
-      </nav>
+    <!-- Live Status Pill -->
+    <div class="pixel-status-bar">
+      <span class="pixel-heart-indicator">
+        <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges">
+          <path d="M3 2h3v2H3zm7 0h3v2h-3zM1 4h7v2H1zm8 0h7v2H9zM1 6h14v2H1zm2 2h12v2H3zm2 2h8v2H5zm2 2h4v2H7zm1 2h2v2H8z" fill="#cf3636"/>
+        </svg>
+      </span>
+      <span id="server-addr-label">127.0.0.1:7878</span>
+      <span style="color: #666;">|</span>
+      <span id="ping-stat" style="font-weight: 700; color: var(--pixel-blue-primary);">-- ms</span>
+      <span style="color: #666;">|</span>
+      <span id="server-state-badge" class="pixel-badge pixel-badge-green">ONLINE</span>
     </div>
   </header>
 
-  <!-- Main Container -->
-  <main class="container">
+  <!-- Desktop Workstation Area -->
+  <div class="pixel-grid-desktop">
 
-    <!-- TAB 1: OVERVIEW & ARCHITECTURE -->
-    <section id="tab-overview" class="tab-content active">
-      <!-- Metrics Row -->
-      <div class="grid-cols-4">
-        <div class="card metric-card">
-          <div class="metric-label">Server State</div>
-          <div class="metric-value" style="color: var(--accent-emerald);">ONLINE</div>
-          <div class="metric-sub">Listening on port 7878</div>
-        </div>
-        <div class="card metric-card">
-          <div class="metric-label">Heartbeat Ping</div>
-          <div class="metric-value" id="metric-latency">-- ms</div>
-          <div class="metric-sub">Auto-polled via GET /health</div>
-        </div>
-        <div class="card metric-card">
-          <div class="metric-label">Uptime Pings</div>
-          <div class="metric-value" id="metric-pings">0</div>
-          <div class="metric-sub">Active session telemetry</div>
-        </div>
-        <div class="card metric-card">
-          <div class="metric-label">Browser Requests</div>
-          <div class="metric-value" id="metric-requests">0</div>
-          <div class="metric-sub">Handled by thread pool</div>
-        </div>
-      </div>
+    <!-- LEFT COLUMN: Desktop Utility Windows -->
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
 
-      <!-- Architecture Pipeline -->
-      <div class="card">
-        <h2 class="section-title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--accent-cyan)">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
-          </svg>
-          POSIX Multithreaded Core Architecture
-        </h2>
-        <p class="section-desc">
-          Farloom uses zero external HTTP/networking frameworks. Every layer is implemented directly using modern C++20 and standard POSIX sockets.
-        </p>
-
-        <div class="pipeline">
-          <div class="pipe-step">
-            <div class="pipe-step-num">Layer 01</div>
-            <div class="pipe-step-title">TCP Acceptor</div>
-            <div class="pipe-step-detail">Single non-blocking thread accepting raw socket descriptors with SO_REUSEADDR.</div>
-          </div>
-          <div class="pipe-step">
-            <div class="pipe-step-num">Layer 02</div>
-            <div class="pipe-step-title">Bounded Queue</div>
-            <div class="pipe-step-detail">Fixed capacity of 64 jobs. If full, triggers instantaneous 503 backpressure load shedding.</div>
-          </div>
-          <div class="pipe-step">
-            <div class="pipe-step-num">Layer 03</div>
-            <div class="pipe-step-title">Worker Pool</div>
-            <div class="pipe-step-detail">Fixed 4 POSIX threads waiting on std::condition_variable with graceful drain shutdown.</div>
-          </div>
-          <div class="pipe-step">
-            <div class="pipe-step-num">Layer 04</div>
-            <div class="pipe-step-title">Router & Guard</div>
-            <div class="pipe-step-detail">Exact path matching + canonicalized static sandbox preventing directory traversal.</div>
-          </div>
-          <div class="pipe-step">
-            <div class="pipe-step-num">Layer 05</div>
-            <div class="pipe-step-title">HTTP/1.1 Wire</div>
-            <div class="pipe-step-detail">Streaming parser enforcing RFC 9112 limits and SHUT_WR half-close connection drain.</div>
+      <!-- Window 1: My Server / System Specs -->
+      <div class="pixel-window">
+        <div class="pixel-titlebar">
+          <span>My System</span>
+          <div class="pixel-title-controls">
+            <button class="pixel-window-btn" title="Minimize">_</button>
+            <button class="pixel-window-btn" title="Maximize">□</button>
+            <button class="pixel-window-btn" title="Close">✕</button>
           </div>
         </div>
-      </div>
-
-      <!-- Quick Server Capabilities -->
-      <div class="grid-cols-4" style="margin-top: 1.5rem; margin-bottom: 0;">
-        <div class="card">
-          <div class="metric-label" style="color: var(--accent-cyan);">Zero Overhead Error Handling</div>
-          <p style="font-size: 0.825rem; color: var(--text-secondary); margin-top: 0.5rem;">
-            Custom monadic <code>Result&lt;T, E&gt;</code> provides Rust-like compile-time safety without C++ exception throwing overhead.
-          </p>
-        </div>
-        <div class="card">
-          <div class="metric-label" style="color: var(--accent-emerald);">Path Traversal Shield</div>
-          <p style="font-size: 0.825rem; color: var(--text-secondary); margin-top: 0.5rem;">
-            Every file path is sanitized, percent-decoded, and verified component-by-component against boundary escapes.
-          </p>
-        </div>
-        <div class="card">
-          <div class="metric-label" style="color: var(--accent-purple);">Graceful Drain Budget</div>
-          <p style="font-size: 0.825rem; color: var(--text-secondary); margin-top: 0.5rem;">
-            Socket teardown initiates half-close (<code>SHUT_WR</code>) and drains incoming bytes, eliminating spurious TCP RST packets.
-          </p>
-        </div>
-        <div class="card">
-          <div class="metric-label" style="color: var(--accent-amber);">Single-Write Logging</div>
-          <p style="font-size: 0.825rem; color: var(--text-secondary); margin-top: 0.5rem;">
-            Structured <code>key=value</code> log records formatted with microsecond timestamps and atomic stream locking.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 2: API PLAYGROUND -->
-    <section id="tab-playground" class="tab-content">
-      <div class="playground-layout">
-        <!-- Request Builder Column -->
-        <div class="card">
-          <h2 class="section-title">Request Builder</h2>
-          <p class="section-desc">Compose and fire HTTP requests directly to the Farloom C++ server.</p>
-
-          <div class="form-group">
-            <label class="form-label">Quick Presets</label>
-            <div class="presets-list">
-              <span class="preset-chip" data-preset="health">GET /health</span>
-              <span class="preset-chip" data-preset="echoJson">POST /api/echo (JSON)</span>
-              <span class="preset-chip" data-preset="echoText">POST /api/echo (Text)</span>
-              <span class="preset-chip" data-preset="staticIndex">GET /index.html</span>
-              <span class="preset-chip" data-preset="staticCss">GET /style.css</span>
-              <span class="preset-chip" data-preset="traversalCheck">GET /..%2fCMakeLists.txt</span>
-              <span class="preset-chip" data-preset="notAllowed">DELETE /health</span>
+        <div class="pixel-window-body">
+          <div style="display: flex; gap: 10px; align-items: flex-start;">
+            <!-- Pixel Document Icon -->
+            <svg width="34" height="34" viewBox="0 0 16 16" shape-rendering="crispEdges" style="flex-shrink: 0;">
+              <path d="M3 1h7l4 4v10H3z" fill="#ffffff"/>
+              <path d="M3 1h7v4h4v10H3V1m0-1a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V5l-5-5H3z" fill="#000000"/>
+              <path d="M5 6h4v1H5zm0 2h6v1H5zm0 2h6v1H5zm0 2h4v1H5z" fill="#888888"/>
+            </svg>
+            <div style="font-size: 0.7rem; line-height: 1.4;">
+              <strong>Farloom C++20</strong><br>
+              A high-performance multithreaded web server built on POSIX primitives.
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Method & Target Endpoint</label>
-            <div class="input-row">
-              <select id="api-method" class="select-input">
-                <option value="GET">GET</option>
-                <option value="POST" selected>POST</option>
-                <option value="PUT">PUT</option>
-                <option value="DELETE">DELETE</option>
-                <option value="HEAD">HEAD</option>
-              </select>
-              <input type="text" id="api-path" class="text-input" value="/api/echo">
+          <div class="pixel-stat-card" style="text-align: left; font-size: 0.7rem; line-height: 1.6;">
+            <div>• <strong>Language:</strong> Modern C++20</div>
+            <div>• <strong>Workers:</strong> 4 Threads</div>
+            <div>• <strong>Queue Size:</strong> 64 Slots</div>
+            <div>• <strong>Static Root:</strong> ./public</div>
+            <div>• <strong>Timeouts:</strong> 5s Read / Write</div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+            <div class="pixel-toggle-group">
+              <div id="telemetry-toggle" class="pixel-toggle">
+                <div class="pixel-toggle-knob"></div>
+              </div>
+              <span id="telemetry-toggle-label" style="font-size: 0.7rem; font-weight: 700;">ON</span>
+            </div>
+            <button class="btn-pixel btn-pixel-secondary" id="system-ok-btn" style="padding: 4px 10px; font-size: 0.7rem;">OK</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Window 2: File Explorer & Assets -->
+      <div class="pixel-window">
+        <div class="pixel-titlebar">
+          <span>Explorer - /public</span>
+          <div class="pixel-title-controls">
+            <button class="pixel-window-btn">_</button>
+            <button class="pixel-window-btn">□</button>
+            <button class="pixel-window-btn">✕</button>
+          </div>
+        </div>
+        <div class="pixel-window-body" style="padding: 0.75rem;">
+          <div style="font-size: 0.7rem; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 3px;" class="pixel-dropdown-row">
+              <!-- Pixel Folder -->
+              <svg width="18" height="18" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                <path d="M2 3h4l2 2h6v8H2z" fill="#f8c822"/>
+                <path d="M2 3h4l2 2h6v8H2V3m0-1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H8L6 2H2z" fill="#000000"/>
+              </svg>
+              <span>public/</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; padding-left: 18px; cursor: pointer;" class="pixel-dropdown-row file-chip" data-file="/index.html">
+              <span style="color: var(--pixel-blue-primary);">[HTML]</span> index.html
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; padding-left: 18px; cursor: pointer;" class="pixel-dropdown-row file-chip" data-file="/style.css">
+              <span style="color: var(--pixel-green-dark);">[CSS]</span> style.css
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; padding-left: 18px; cursor: pointer;" class="pixel-dropdown-row file-chip" data-file="/app.js">
+              <span style="color: var(--pixel-yellow-dark);">[JS]</span> app.js
             </div>
           </div>
+        </div>
+      </div>
 
-          <div class="form-group">
-            <label class="form-label">HTTP Headers (Key: Value per line)</label>
-            <textarea id="api-headers" class="textarea-input" style="min-height: 70px;" placeholder="Content-Type: application/json&#10;X-Custom: farloom-test">Content-Type: application/json</textarea>
+      <!-- Window 3: Notice Dialog Box (Matching Template) -->
+      <div class="pixel-notice-box">
+        <!-- Pixel Warning Triangle -->
+        <svg class="pixel-warn-triangle" viewBox="0 0 24 24" shape-rendering="crispEdges">
+          <path d="M12 2L1 21h22L12 2z" fill="#f8c822"/>
+          <path d="M12 2L1 21h22L12 2m0-2l13 22H0L12 0z" fill="#000000"/>
+          <path d="M11 9h2v6h-2zm0 8h2v2h-2z" fill="#000000"/>
+        </svg>
+        <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+          <div style="font-size: 0.75rem; font-weight: 700;">Notice: Ready for traffic</div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-pixel btn-pixel-secondary" id="notice-yes-btn" style="padding: 4px 10px; font-size: 0.7rem; border: 2px dotted #000;">Yes</button>
+            <button class="btn-pixel btn-pixel-secondary" id="notice-no-btn" style="padding: 4px 10px; font-size: 0.7rem;">No</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pixel Speech Bubble Tooltip (Matching Template) -->
+      <div class="pixel-speech-bubble">
+        <strong>Tip:</strong> When the 64-capacity bounded queue is full, Farloom responds with <code>503 Service Unavailable</code> + <code>Retry-After: 1</code>!
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: Main Operating Window -->
+    <div class="pixel-window" style="min-height: 600px;">
+      
+      <!-- Main Window Titlebar -->
+      <div class="pixel-titlebar">
+        <span>Farloom Server Workstation - [Active Session]</span>
+        <div class="pixel-title-controls">
+          <button class="pixel-window-btn" title="Minimize">_</button>
+          <button class="pixel-window-btn" title="Maximize">□</button>
+          <button class="pixel-window-btn" title="Close">✕</button>
+        </div>
+      </div>
+
+      <!-- Classic Menu Bar (File, Edit, View, Help) -->
+      <div class="pixel-menubar">
+        <div class="pixel-menu-item">
+          File
+          <div class="pixel-menu-dropdown">
+            <div class="pixel-dropdown-row" id="menu-new-req"><span>New Request</span><span style="color:#666;">Ctrl+N</span></div>
+            <div class="pixel-dropdown-row" id="menu-save-log"><span>Save Log</span><span style="color:#666;">Ctrl+S</span></div>
+            <div class="pixel-dropdown-row disabled"><span>Exit</span></div>
+          </div>
+        </div>
+        <div class="pixel-menu-item">
+          Edit
+          <div class="pixel-menu-dropdown">
+            <div class="pixel-dropdown-row" id="menu-copy-res"><span>Copy Response</span><span style="color:#666;">Ctrl+C</span></div>
+            <div class="pixel-dropdown-row" id="menu-clear-all"><span>Clear Form</span></div>
+          </div>
+        </div>
+        <div class="pixel-menu-item">
+          View
+          <div class="pixel-menu-dropdown">
+            <div class="pixel-dropdown-row nav-link" data-tab="tab-monitor"><span>Overview & Architecture</span></div>
+            <div class="pixel-dropdown-row nav-link" data-tab="tab-api"><span>API Console</span></div>
+            <div class="pixel-dropdown-row nav-link" data-tab="tab-stress"><span>Stress Tester</span></div>
+            <div class="pixel-dropdown-row nav-link" data-tab="tab-security"><span>Security Lab</span></div>
+          </div>
+        </div>
+        <div class="pixel-menu-item">
+          Help
+          <div class="pixel-menu-dropdown">
+            <div class="pixel-dropdown-row" id="menu-about"><span>About Farloom</span></div>
+            <div class="pixel-dropdown-row" id="menu-docs"><span>Documentation</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tab Buttons Strip -->
+      <div class="pixel-tabs-strip">
+        <button class="pixel-tab-btn active" data-tab="tab-monitor">
+          🖥 Monitor
+        </button>
+        <button class="pixel-tab-btn" data-tab="tab-api">
+          ⚡ API Console
+        </button>
+        <button class="pixel-tab-btn" data-tab="tab-stress">
+          ⏱ Stress Tester
+        </button>
+        <button class="pixel-tab-btn" data-tab="tab-security">
+          🛡 Security Lab
+        </button>
+      </div>
+
+      <!-- TAB PANEL 1: MONITOR & ARCHITECTURE -->
+      <div id="tab-monitor" class="pixel-window-body tab-panel active">
+        <!-- Telemetry Row -->
+        <div class="pixel-metric-strip">
+          <div class="pixel-stat-card">
+            <div class="pixel-stat-label">Server Port</div>
+            <div class="pixel-stat-val" style="color: var(--pixel-blue-primary);">7878</div>
+          </div>
+          <div class="pixel-stat-card">
+            <div class="pixel-stat-label">Live Ping</div>
+            <div class="pixel-stat-val" id="metric-ping-val">-- ms</div>
+          </div>
+          <div class="pixel-stat-card">
+            <div class="pixel-stat-label">Uptime Pings</div>
+            <div class="pixel-stat-val" id="metric-pings-count">0</div>
+          </div>
+          <div class="pixel-stat-card">
+            <div class="pixel-stat-label">Requests Sent</div>
+            <div class="pixel-stat-val" id="metric-reqs-count" style="color: var(--pixel-green-dark);">0</div>
+          </div>
+        </div>
+
+        <!-- Architecture Flow -->
+        <div style="background: #fff; border: 2px solid #000; box-shadow: inset 1px 1px 0 var(--pixel-surface-dark); padding: 1rem;">
+          <div style="font-size: 0.8rem; font-weight: 700; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;">
+            <span class="pixel-badge pixel-badge-blue">ARCHITECTURE</span>
+            POSIX Multithreaded Core Pipeline
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Request Body (for POST / PUT)</label>
-            <textarea id="api-body" class="textarea-input" placeholder='{"message": "Hello World"}'>{
-  "client": "Farloom Control Plane",
-  "port": 7878,
-  "engine": "Modern C++20",
-  "status": "active"
-}</textarea>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; text-align: center;">
+            <div style="border: 2px solid #000; background: var(--pixel-bg); padding: 8px;">
+              <div style="font-size: 0.6rem; color: var(--pixel-blue-primary); font-weight: 700;">STAGE 01</div>
+              <div style="font-size: 0.75rem; font-weight: 700; margin: 3px 0;">Acceptor</div>
+              <div style="font-size: 0.65rem; color: #555;">POSIX socket accept()</div>
+            </div>
+            <div style="border: 2px solid #000; background: var(--pixel-bg); padding: 8px;">
+              <div style="font-size: 0.6rem; color: var(--pixel-blue-primary); font-weight: 700;">STAGE 02</div>
+              <div style="font-size: 0.75rem; font-weight: 700; margin: 3px 0;">Queue (64)</div>
+              <div style="font-size: 0.65rem; color: #555;">Fast 503 load shedding</div>
+            </div>
+            <div style="border: 2px solid #000; background: var(--pixel-bg); padding: 8px;">
+              <div style="font-size: 0.6rem; color: var(--pixel-blue-primary); font-weight: 700;">STAGE 03</div>
+              <div style="font-size: 0.75rem; font-weight: 700; margin: 3px 0;">4 Workers</div>
+              <div style="font-size: 0.65rem; color: #555;">Fixed thread pool</div>
+            </div>
+            <div style="border: 2px solid #000; background: var(--pixel-bg); padding: 8px;">
+              <div style="font-size: 0.6rem; color: var(--pixel-blue-primary); font-weight: 700;">STAGE 04</div>
+              <div style="font-size: 0.75rem; font-weight: 700; margin: 3px 0;">Security</div>
+              <div style="font-size: 0.65rem; color: #555;">Canonical containment</div>
+            </div>
           </div>
+        </div>
 
-          <button id="api-send-btn" class="btn-primary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-            </svg> Send Request
+        <!-- Button Styles Gallery from Template Image -->
+        <div style="background: var(--pixel-window-bg); border: 2px solid #000; padding: 1rem; box-shadow: inset 1px 1px 0 #fff;">
+          <div style="font-size: 0.75rem; font-weight: 700; margin-bottom: 0.75rem;">Button Styles Pack (From Design Spec):</div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn-pixel btn-pixel-primary">Primary Button</button>
+            <button class="btn-pixel btn-pixel-secondary">Secondary Button</button>
+            <button class="btn-pixel btn-pixel-disabled" disabled>Disabled Button</button>
+            <button class="btn-pixel btn-pixel-danger">Danger Button</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB PANEL 2: API CONSOLE -->
+      <div id="tab-api" class="pixel-window-body tab-panel">
+        
+        <!-- Presets Row -->
+        <div>
+          <div style="font-size: 0.7rem; font-weight: 700; margin-bottom: 4px;">Quick Presets:</div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <span class="pixel-chip" data-preset="health">GET /health</span>
+            <span class="pixel-chip" data-preset="echoJson">POST /api/echo (JSON)</span>
+            <span class="pixel-chip" data-preset="echoText">POST /api/echo (Text)</span>
+            <span class="pixel-chip" data-preset="static">GET /index.html</span>
+            <span class="pixel-chip" data-preset="traversal">GET /..%2fCMakeLists.txt</span>
+            <span class="pixel-chip" data-preset="method405">DELETE /health</span>
+          </div>
+        </div>
+
+        <!-- Target & Method -->
+        <div style="display: flex; gap: 8px;">
+          <select id="api-method" class="pixel-inset-box" style="width: 100px;">
+            <option value="GET">GET</option>
+            <option value="POST" selected>POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+            <option value="HEAD">HEAD</option>
+          </select>
+          <input type="text" id="api-path" class="pixel-inset-box" style="flex: 1;" value="/api/echo">
+        </div>
+
+        <!-- Headers Input -->
+        <div>
+          <div style="font-size: 0.7rem; font-weight: 700; margin-bottom: 4px;">Headers (Key: Value):</div>
+          <textarea id="api-headers" class="pixel-inset-box" style="width: 100%; height: 50px;">Content-Type: application/json</textarea>
+        </div>
+
+        <!-- Body Input -->
+        <div>
+          <div style="font-size: 0.7rem; font-weight: 700; margin-bottom: 4px;">Body (POST / PUT):</div>
+          <textarea id="api-body" class="pixel-inset-box" style="width: 100%; height: 80px;">{"message": "Hello from Farloom Pixel UI", "mode": "C++20"}</textarea>
+        </div>
+
+        <!-- Buttons Row -->
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <button class="btn-pixel btn-pixel-primary" id="api-send-btn">
+            Send Request (Ctrl+Enter)
           </button>
-          <span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 0.75rem;">Shortcut: <kbd style="background: var(--bg-tertiary); padding: 2px 5px; border-radius: 4px;">Cmd+Enter</kbd></span>
+          <button class="btn-pixel btn-pixel-secondary" id="api-clear-btn">
+            Clear
+          </button>
+          <span id="api-status-badge" class="pixel-badge pixel-badge-blue">Status: Ready</span>
+          <span id="api-time-stat" style="font-family: var(--font-mono); font-size: 1rem; color: #555;">0 ms</span>
         </div>
 
-        <!-- Response Inspector Column -->
-        <div class="card">
-          <div class="response-header">
-            <div>
-              <h2 class="section-title" style="margin-bottom: 0;">Response Inspector</h2>
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span id="res-status" class="status-badge status-200">Ready</span>
-              <span id="res-time" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">0.00 ms</span>
-            </div>
+        <!-- Output Terminal -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <div style="font-size: 0.7rem; font-weight: 700;">Response Wire Output:</div>
+            <button class="btn-pixel btn-pixel-secondary" id="copy-terminal-btn" style="padding: 2px 6px; font-size: 0.65rem;">Copy Output</button>
           </div>
-
-          <div class="form-group">
-            <label class="form-label">Response Headers</label>
-            <pre id="res-headers" class="code-box" style="max-height: 100px;">(Send a request to inspect response headers)</pre>
-          </div>
-
-          <div class="form-group" style="margin-bottom: 0;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-              <label class="form-label" style="margin-bottom: 0;">Response Body</label>
-              <button id="copy-res-btn" class="btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">Copy</button>
-            </div>
-            <pre id="res-body" class="code-box" style="min-height: 180px;">{"ready": true, "instruction": "Click Send Request or pick a preset above."}</pre>
-          </div>
+          <div id="api-terminal" class="pixel-terminal">Click "Send Request" to fire an HTTP request to Farloom...</div>
         </div>
+
       </div>
-    </section>
 
-    <!-- TAB 3: STRESS TESTER -->
-    <section id="tab-stress" class="tab-content">
-      <div class="card">
-        <h2 class="section-title">In-Browser Concurrency & Load Simulator</h2>
-        <p class="section-desc">
-          Test Farloom's multithreaded worker pool and bounded queue backpressure directly from your browser by firing concurrent HTTP bursts.
-        </p>
+      <!-- TAB PANEL 3: STRESS TESTER -->
+      <div id="tab-stress" class="pixel-window-body tab-panel">
+        
+        <div style="font-size: 0.75rem; line-height: 1.4;">
+          <strong>In-Browser Concurrency Stress Simulator</strong><br>
+          Stress test Farloom's worker pool (4 workers) and bounded queue (64 capacity) with concurrent requests.
+        </div>
 
-        <div class="stress-controls">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
           <div>
-            <label class="form-label">Target Endpoint</label>
-            <input type="text" id="stress-target" class="text-input" value="/health" style="width: 100%;">
-          </div>
-          <div>
-            <label class="form-label">Total Requests</label>
-            <select id="stress-batch-size" class="select-input" style="width: 100%;">
+            <div class="pixel-stat-label">Total Requests</div>
+            <select id="stress-requests-select" class="pixel-inset-box" style="width: 100%;">
               <option value="20">20 Requests (Quick Burst)</option>
               <option value="50" selected>50 Requests (Standard)</option>
-              <option value="100">100 Requests (Queue Saturation)</option>
-              <option value="250">250 Requests (Heavy Load)</option>
+              <option value="100">100 Requests (Queue Stress)</option>
+              <option value="200">200 Requests (Saturation)</option>
             </select>
           </div>
           <div>
-            <label class="form-label">Concurrency Level</label>
-            <select id="stress-concurrency" class="select-input" style="width: 100%;">
-              <option value="2">2 Concurrent Connections</option>
+            <div class="pixel-stat-label">Concurrency Level</div>
+            <select id="stress-concurrency-select" class="pixel-inset-box" style="width: 100%;">
               <option value="4">4 Concurrent (Matching Workers)</option>
               <option value="8" selected>8 Concurrent (Worker Contention)</option>
-              <option value="16">16 Concurrent (Queue Stress)</option>
-              <option value="32">32 Concurrent (Backpressure)</option>
+              <option value="16">16 Concurrent (Queue Saturation)</option>
+              <option value="32">32 Concurrent (Backpressure 503)</option>
             </select>
           </div>
           <div style="display: flex; align-items: flex-end;">
-            <button id="stress-start-btn" class="btn-primary" style="width: 100%; justify-content: center;">
-              Start Concurrency Test
+            <button class="btn-pixel btn-pixel-primary" id="stress-start-btn" style="width: 100%;">
+              Start Benchmark
             </button>
           </div>
         </div>
 
-        <div class="progress-bar-bg">
-          <div id="stress-progress" class="progress-bar-fill"></div>
-        </div>
-
-        <!-- Benchmark Metrics -->
-        <div class="grid-cols-4" style="margin-bottom: 1.5rem;">
-          <div class="card metric-card" style="padding: 1rem;">
-            <div class="metric-label">Completed</div>
-            <div class="metric-value" id="stress-total">0 / 50</div>
-          </div>
-          <div class="card metric-card" style="padding: 1rem;">
-            <div class="metric-label">200 OK</div>
-            <div class="metric-value" id="stress-200" style="color: var(--accent-emerald);">0</div>
-          </div>
-          <div class="card metric-card" style="padding: 1rem;">
-            <div class="metric-label">503 Overloaded</div>
-            <div class="metric-value" id="stress-503" style="color: var(--accent-rose);">0</div>
-          </div>
-          <div class="card metric-card" style="padding: 1rem;">
-            <div class="metric-label">Errors</div>
-            <div class="metric-value" id="stress-errors" style="color: var(--accent-amber);">0</div>
-          </div>
-        </div>
-
-        <div class="grid-cols-4" style="margin-bottom: 1.5rem;">
-          <div class="card metric-card" style="padding: 1rem;">
-            <div class="metric-label">Throughput</div>
-            <div class="metric-value" id="stress-tps" style="color: var(--accent-cyan); font-size: 1.5rem;">--</div>
-          </div>
-          <div class="card metric-card" style="padding: 1rem;">
-            <div class="metric-label">Average Latency</div>
-            <div class="metric-value" id="stress-avg" style="font-size: 1.5rem;">--</div>
-          </div>
-          <div class="card metric-card" style="padding: 1rem;">
-            <div class="metric-label">P95 Latency</div>
-            <div class="metric-value" id="stress-p95" style="color: var(--accent-indigo); font-size: 1.5rem;">--</div>
-          </div>
-          <div class="card metric-card" style="padding: 1rem;">
-            <div class="metric-label">Queue Capacity</div>
-            <div class="metric-value" style="font-size: 1.5rem;">64 Slots</div>
-          </div>
-        </div>
-
-        <!-- Visual Distribution -->
+        <!-- Classic Windows Segmented Progress Bar (Matching Template) -->
         <div>
-          <label class="form-label">Client-Side Latency Distribution</label>
-          <div id="latency-distribution-bars" style="display: flex; gap: 8px; align-items: flex-end; height: 110px; background: #06090e; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-            <div style="color: var(--text-muted); font-size: 0.8rem; margin: auto;">Run the test to generate latency histogram.</div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 4px;">
+            <span>Progress:</span>
+            <span id="stress-progress-count">0 / 50</span>
+          </div>
+          <div class="pixel-progress-wrap">
+            <div class="pixel-progress-bar" id="pixel-progress-bar">
+              <!-- Segmented blocks injected via JS -->
+            </div>
+            <div class="pixel-progress-pct" id="stress-pct">0%</div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- TAB 4: SECURITY LAB -->
-    <section id="tab-security" class="tab-content">
-      <div class="card" style="margin-bottom: 1.5rem;">
-        <h2 class="section-title">Interactive Path Traversal & Security Sandbox</h2>
-        <p class="section-desc">
-          Test Farloom's defenses against real attack vectors. Farloom defends before filesystem resolution using component-wise canonicalization and input sanitization.
-        </p>
-
-        <div class="security-grid">
-          <!-- Vector 1 -->
-          <div class="security-card">
-            <div>
-              <span class="security-badge badge-attack">Attack Vector</span>
-              <h3 style="font-size: 1rem; margin-bottom: 0.25rem;">Percent-Encoded Traversal</h3>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
-                Attempts to escape <code>./public</code> to read <code>CMakeLists.txt</code> via URL percent encoding.
-              </p>
-              <div class="security-path">GET /..%2fCMakeLists.txt</div>
-            </div>
-            <div>
-              <button class="btn-secondary test-security-btn" data-path="/..%2fCMakeLists.txt">Run Test</button>
-              <span class="test-result-label" style="font-size: 0.75rem; margin-left: 0.5rem; color: var(--text-muted);">Not tested</span>
-            </div>
+        <!-- Results Metric Strip -->
+        <div class="pixel-metric-strip">
+          <div class="pixel-stat-card">
+            <div class="pixel-stat-label">200 OK</div>
+            <div class="pixel-stat-val" id="stress-200" style="color: var(--pixel-green-dark);">0</div>
           </div>
-
-          <!-- Vector 2 -->
-          <div class="security-card">
-            <div>
-              <span class="security-badge badge-attack">Attack Vector</span>
-              <h3 style="font-size: 1rem; margin-bottom: 0.25rem;">Windows Backslash Traversal</h3>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
-                Attempts to bypass UNIX separator checks using Windows backslash separators.
-              </p>
-              <div class="security-path">GET /..\..\etc\passwd</div>
-            </div>
-            <div>
-              <button class="btn-secondary test-security-btn" data-path="/..\..\etc\passwd">Run Test</button>
-              <span class="test-result-label" style="font-size: 0.75rem; margin-left: 0.5rem; color: var(--text-muted);">Not tested</span>
-            </div>
+          <div class="pixel-stat-card">
+            <div class="pixel-stat-label">503 Overloaded</div>
+            <div class="pixel-stat-val" id="stress-503" style="color: var(--pixel-red);">0</div>
           </div>
-
-          <!-- Vector 3 -->
-          <div class="security-card">
-            <div>
-              <span class="security-badge badge-attack">Attack Vector</span>
-              <h3 style="font-size: 1rem; margin-bottom: 0.25rem;">NUL Byte Poisoning</h3>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
-                Injects %00 to truncate filename checks in underlying POSIX C calls.
-              </p>
-              <div class="security-path">GET /%00index.html</div>
-            </div>
-            <div>
-              <button class="btn-secondary test-security-btn" data-path="/%00index.html">Run Test</button>
-              <span class="test-result-label" style="font-size: 0.75rem; margin-left: 0.5rem; color: var(--text-muted);">Not tested</span>
-            </div>
+          <div class="pixel-stat-card">
+            <div class="pixel-stat-label">Throughput</div>
+            <div class="pixel-stat-val" id="stress-throughput" style="color: var(--pixel-blue-primary);">--</div>
           </div>
-
-          <!-- Vector 4 -->
-          <div class="security-card">
-            <div>
-              <span class="security-badge badge-attack">Attack Vector</span>
-              <h3 style="font-size: 1rem; margin-bottom: 0.25rem;">NTFS Alternate Data Stream</h3>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
-                Attempts to access forbidden files using colon NTFS stream identifiers.
-              </p>
-              <div class="security-path">GET /index.html::$DATA</div>
-            </div>
-            <div>
-              <button class="btn-secondary test-security-btn" data-path="/index.html::$DATA">Run Test</button>
-              <span class="test-result-label" style="font-size: 0.75rem; margin-left: 0.5rem; color: var(--text-muted);">Not tested</span>
-            </div>
-          </div>
-
-          <!-- Vector 5 -->
-          <div class="security-card">
-            <div>
-              <span class="security-badge badge-defense">Protocol Strictness</span>
-              <h3 style="font-size: 1rem; margin-bottom: 0.25rem;">Method Not Allowed (405)</h3>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
-                Attempts unsupported HTTP verb on route with strict method whitelist; returns sorted <code>Allow</code> header.
-              </p>
-              <div class="security-path">DELETE /health</div>
-            </div>
-            <div>
-              <button class="btn-secondary test-security-btn" data-path="/health" data-method="DELETE">Run Test</button>
-              <span class="test-result-label" style="font-size: 0.75rem; margin-left: 0.5rem; color: var(--text-muted);">Not tested</span>
-            </div>
-          </div>
-
-          <!-- Vector 6 -->
-          <div class="security-card">
-            <div>
-              <span class="security-badge badge-defense">Protocol Strictness</span>
-              <h3 style="font-size: 1rem; margin-bottom: 0.25rem;">Static Route Write Protection</h3>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
-                Static files are strictly read-only (`GET` only). Writing via `POST` returns 405 Method Not Allowed.
-              </p>
-              <div class="security-path">POST /index.html</div>
-            </div>
-            <div>
-              <button class="btn-secondary test-security-btn" data-path="/index.html" data-method="POST">Run Test</button>
-              <span class="test-result-label" style="font-size: 0.75rem; margin-left: 0.5rem; color: var(--text-muted);">Not tested</span>
-            </div>
+          <div class="pixel-stat-card">
+            <div class="pixel-stat-label">Average Latency</div>
+            <div class="pixel-stat-val" id="stress-avg-lat">--</div>
           </div>
         </div>
+
       </div>
-    </section>
 
-  </main>
+      <!-- TAB PANEL 4: SECURITY LAB -->
+      <div id="tab-security" class="pixel-window-body tab-panel">
+        
+        <div style="font-size: 0.75rem; line-height: 1.4;">
+          <strong>Interactive Path-Traversal & Protocol Defense Sandbox</strong><br>
+          Click any vector to simulate an attack against Farloom's POSIX security controls.
+        </div>
 
-  <!-- Footer -->
-  <footer>
-    <p>
-      <strong>Farloom C++20</strong> · Built with modern C++20, CMake, POSIX sockets, and standard threading · 
-      <a href="https://github.com/Fable98/farloom-C-plus-plus" target="_blank" rel="noopener">GitHub Repository</a>
-    </p>
+        <div class="pixel-sec-grid">
+          
+          <div class="pixel-sec-card">
+            <div>
+              <span class="pixel-badge pixel-badge-red">VECTOR 01</span>
+              <div style="font-size: 0.75rem; font-weight: 700; margin: 4px 0;">URL Percent Traversal</div>
+              <div style="font-size: 0.65rem; color: #555; margin-bottom: 6px;">Attempts to escape static root via %2f.</div>
+              <div class="pixel-sec-code">GET /..%2fCMakeLists.txt</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+              <button class="btn-pixel btn-pixel-secondary test-attack-btn" data-path="/..%2fCMakeLists.txt">Test</button>
+              <span class="attack-result pixel-badge pixel-badge-yellow">Unchecked</span>
+            </div>
+          </div>
+
+          <div class="pixel-sec-card">
+            <div>
+              <span class="pixel-badge pixel-badge-red">VECTOR 02</span>
+              <div style="font-size: 0.75rem; font-weight: 700; margin: 4px 0;">Backslash Traversal</div>
+              <div style="font-size: 0.65rem; color: #555; margin-bottom: 6px;">Attempts Windows backslash bypass.</div>
+              <div class="pixel-sec-code">GET /..\..\etc\passwd</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+              <button class="btn-pixel btn-pixel-secondary test-attack-btn" data-path="/..\..\etc\passwd">Test</button>
+              <span class="attack-result pixel-badge pixel-badge-yellow">Unchecked</span>
+            </div>
+          </div>
+
+          <div class="pixel-sec-card">
+            <div>
+              <span class="pixel-badge pixel-badge-red">VECTOR 03</span>
+              <div style="font-size: 0.75rem; font-weight: 700; margin: 4px 0;">NUL Byte Poisoning</div>
+              <div style="font-size: 0.65rem; color: #555; margin-bottom: 6px;">Injects %00 string terminator.</div>
+              <div class="pixel-sec-code">GET /%00index.html</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+              <button class="btn-pixel btn-pixel-secondary test-attack-btn" data-path="/%00index.html">Test</button>
+              <span class="attack-result pixel-badge pixel-badge-yellow">Unchecked</span>
+            </div>
+          </div>
+
+          <div class="pixel-sec-card">
+            <div>
+              <span class="pixel-badge pixel-badge-blue">VECTOR 04</span>
+              <div style="font-size: 0.75rem; font-weight: 700; margin: 4px 0;">Method Whitelist (405)</div>
+              <div style="font-size: 0.65rem; color: #555; margin-bottom: 6px;">DELETE on /health returns 405 + Allow.</div>
+              <div class="pixel-sec-code">DELETE /health</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+              <button class="btn-pixel btn-pixel-secondary test-attack-btn" data-path="/health" data-method="DELETE">Test</button>
+              <span class="attack-result pixel-badge pixel-badge-yellow">Unchecked</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Bottom Retro Palette & Pixel Icon Bar (Matching Design Template) -->
+  <footer class="pixel-footer">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="font-weight: 700;">16-COLOR PALETTE:</span>
+      <!-- 16 color squares -->
+      <div style="display: flex; gap: 3px; border: 1px solid #000; padding: 2px; background: #fff;">
+        <span style="display:inline-block; width:12px; height:12px; background:#000000;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#505050;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#828282;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#c0beba;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#ffffff;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#163c96;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#2458c8;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#3d72e6;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#208040;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#38b764;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#f8c822;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#fff9b8;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#e64c4c;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#cf3636;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#6b3fa0;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#9c78d6;"></span>
+      </div>
+    </div>
+
+    <!-- Pixel Icons Tray (Matching image: Cursors, Hourglass, Folder, Document, Floppy, Heart, Trash) -->
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <!-- Cursor Arrow -->
+      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges">
+        <path d="M1 1v13l4-4 3 6 2-1-3-6h5L1 1z" fill="#000"/>
+        <path d="M2 3v9l3-3 3 6 1-.5-3-6h4L2 3z" fill="#fff"/>
+      </svg>
+      <!-- Hourglass -->
+      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges">
+        <path d="M2 1h12v2l-4 4v2l4 4v2H2v-2l4-4V7L2 3V1z" fill="#000"/>
+        <path d="M4 2h8v1L8 7 4 3V2zm4 7l4 4v1H4v-1l4-4z" fill="#fff"/>
+      </svg>
+      <!-- Folder -->
+      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges">
+        <path d="M1 2h5l2 2h7v9H1z" fill="#f8c822"/>
+        <path d="M1 2h5l2 2h7v9H1V2m-1-1v12h16V3H7L5 1H0z" fill="#000"/>
+      </svg>
+      <!-- Floppy Disk -->
+      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges">
+        <path d="M2 1h10l3 3v11H2z" fill="#2458c8"/>
+        <path d="M4 1h7v4H4zm1 7h7v6H5z" fill="#fff"/>
+        <path d="M2 1h10l3 3v11H2V1m-1-1v16h16V3.5L12.5 0H1z" fill="#000"/>
+      </svg>
+      <!-- Heart -->
+      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges">
+        <path d="M3 2h3v2H3zm7 0h3v2h-3zM1 4h7v2H1zm8 0h7v2H9zM1 6h14v2H1zm2 2h12v2H3zm2 2h8v2H5zm2 2h4v2H7zm1 2h2v2H8z" fill="#cf3636"/>
+      </svg>
+      <!-- Trash Can -->
+      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges">
+        <path d="M4 3h8v11H4zm-2-2h12v2H2zm3-1h6v1H5z" fill="#c0beba"/>
+        <path d="M4 3h8v11H4V3m-1-1v13h10V2H3zm-2-1h14v2H1V1m4-1h6v1H5V0z" fill="#000"/>
+        <path d="M6 5h1v7H6zm3 0h1v7H9z" fill="#888"/>
+      </svg>
+    </div>
   </footer>
 
 </body>
