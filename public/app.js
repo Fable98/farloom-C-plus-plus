@@ -1,4 +1,4 @@
-// FARLOOM C++20 PIXEL UI CONTROLLER
+// Farloom C++20 Server Manager Controller
 document.addEventListener("DOMContentLoaded", () => {
   // Navigation Tabs
   const tabBtns = document.querySelectorAll(".pixel-tab-btn");
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
     telemetryToggle.addEventListener("click", () => {
       isAutoPoll = !isAutoPoll;
       telemetryToggle.classList.toggle("off", !isAutoPoll);
-      telemetryToggleLabel.textContent = isAutoPoll ? "ON" : "OFF";
+      telemetryToggleLabel.textContent = isAutoPoll ? "AUTO-POLL: ON" : "AUTO-POLL: OFF";
       if (isAutoPoll) {
         startAutoPoll();
       } else {
@@ -83,18 +83,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Notice Dialog Buttons
-  const noticeYesBtn = document.getElementById("notice-yes-btn");
-  const noticeNoBtn = document.getElementById("notice-no-btn");
-  if (noticeYesBtn) {
-    noticeYesBtn.addEventListener("click", () => {
+  // System ping button
+  const systemOkBtn = document.getElementById("system-ok-btn");
+  if (systemOkBtn) {
+    systemOkBtn.addEventListener("click", () => {
       pingServer();
-      noticeYesBtn.textContent = "Checked!";
-      setTimeout(() => noticeYesBtn.textContent = "Yes", 1200);
+      systemOkBtn.textContent = "Pinging";
+      setTimeout(() => systemOkBtn.textContent = "Ping", 800);
     });
   }
-  if (noticeNoBtn) {
-    noticeNoBtn.addEventListener("click", () => {
+
+  // Diagnostic Notice Dialog Buttons
+  const noticeCheckBtn = document.getElementById("notice-check-btn");
+  const noticeConsoleBtn = document.getElementById("notice-console-btn");
+  if (noticeCheckBtn) {
+    noticeCheckBtn.addEventListener("click", () => {
+      pingServer();
+      noticeCheckBtn.textContent = "OK!";
+      setTimeout(() => noticeCheckBtn.textContent = "Check", 1000);
+    });
+  }
+  if (noticeConsoleBtn) {
+    noticeConsoleBtn.addEventListener("click", () => {
       switchTab("tab-api");
     });
   }
@@ -129,29 +139,40 @@ document.addEventListener("DOMContentLoaded", () => {
     echoJson: { 
       method: "POST", 
       path: "/api/echo", 
-      headers: "Content-Type: application/json\nX-Client: Farloom-PixelUI", 
-      body: JSON.stringify({ message: "Hello Farloom Retro Pixel OS", timestamp: Date.now() }, null, 2) 
+      headers: "Content-Type: application/json\nX-Client: Farloom-Client", 
+      body: JSON.stringify({ message: "Hello Farloom C++20", timestamp: Date.now() }, null, 2) 
     },
     echoText: { 
       method: "POST", 
       path: "/api/echo", 
       headers: "Content-Type: text/plain", 
-      body: "Pixel UI 16-Color Retro C++20 Web Server" 
+      body: "Farloom Multithreaded C++20 HTTP/1.1 Server" 
     },
     static: { method: "GET", path: "/index.html", headers: "", body: "" },
     traversal: { method: "GET", path: "/..%2fCMakeLists.txt", headers: "", body: "" },
     method405: { method: "DELETE", path: "/health", headers: "", body: "" }
   };
 
+  function applyPreset(presetKey) {
+    const p = presets[presetKey];
+    if (p) {
+      apiMethod.value = p.method;
+      apiPath.value = p.path;
+      apiHeaders.value = p.headers;
+      apiBody.value = p.body;
+    }
+  }
+
   document.querySelectorAll(".pixel-chip").forEach(chip => {
-    chip.addEventListener("click", () => {
-      const p = presets[chip.dataset.preset];
-      if (p) {
-        apiMethod.value = p.method;
-        apiPath.value = p.path;
-        apiHeaders.value = p.headers;
-        apiBody.value = p.body;
-      }
+    chip.addEventListener("click", () => applyPreset(chip.dataset.preset));
+  });
+
+  // Quick Action Buttons on Overview Panel
+  document.querySelectorAll(".quick-action-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      applyPreset(btn.dataset.preset);
+      switchTab("tab-api");
+      executeApi();
     });
   });
 
@@ -275,7 +296,6 @@ ${bodyText}`;
 
   function updateSegmentedBar(percent) {
     stressPct.textContent = `${percent}%`;
-    // Calculate how many 12px segments fit
     const totalSlots = Math.floor(stressProgressBar.clientWidth / 12) || 25;
     const activeSegments = Math.round((percent / 100) * totalSlots);
     
@@ -414,7 +434,7 @@ ${bodyText}`;
   const menuAbout = document.getElementById("menu-about");
   if (menuAbout) {
     menuAbout.addEventListener("click", () => {
-      alert("FARLOOM C++20 - Retro Pixel UI Edition\nA multithreaded HTTP/1.1 server built with POSIX sockets, std::thread, and bounded queue.\nTemplate inspired by classic 16-color Retro Pixel UI.");
+      alert("FARLOOM C++20\nMultithreaded HTTP/1.1 Web Server\nPOSIX sockets · Fixed 4-worker thread pool · 64-capacity bounded queue.");
     });
   }
 

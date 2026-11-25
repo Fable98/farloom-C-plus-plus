@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FARLOOM C++20 | PIXEL UI EDITION</title>
+  <title>Farloom C++20 | Multithreaded HTTP/1.1 Server</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'><rect width='16' height='16' fill='%232458c8'/><rect x='3' y='3' width='10' height='10' fill='%23ffffff'/><rect x='5' y='5' width='6' height='6' fill='%232458c8'/></svg>">
   <link rel="stylesheet" href="/style.css">
   <script defer src="/app.js"></script>
@@ -20,8 +20,8 @@
         </svg>
       </div>
       <div class="pixel-logo-title">
-        <h1>PIXEL UI <span style="font-size: 0.9rem; background: #000; color: #fff; padding: 2px 6px; margin-left: 6px;">FARLOOM C++20</span></h1>
-        <div class="pixel-subtitle">RETRO OS WORKSTATION · POSIX THREAD POOL · BOUNDED QUEUE</div>
+        <h1>FARLOOM <span style="font-size: 0.9rem; background: #000; color: #fff; padding: 2px 6px; margin-left: 6px;">C++20</span></h1>
+        <div class="pixel-subtitle">MULTITHREADED HTTP/1.1 · POSIX THREAD POOL · BOUNDED QUEUE</div>
       </div>
     </div>
 
@@ -46,10 +46,10 @@
     <!-- LEFT COLUMN: Desktop Utility Windows -->
     <div style="display: flex; flex-direction: column; gap: 1.25rem;">
 
-      <!-- Window 1: My Server / System Specs -->
+      <!-- Window 1: Server Configuration -->
       <div class="pixel-window">
         <div class="pixel-titlebar">
-          <span>My System</span>
+          <span>Server Configuration</span>
           <div class="pixel-title-controls">
             <button class="pixel-window-btn" title="Minimize">_</button>
             <button class="pixel-window-btn" title="Maximize">□</button>
@@ -66,26 +66,26 @@
             </svg>
             <div style="font-size: 0.7rem; line-height: 1.4;">
               <strong>Farloom C++20</strong><br>
-              A high-performance multithreaded web server built on POSIX primitives.
+              A high-performance web server built with standard POSIX socket APIs.
             </div>
           </div>
 
           <div class="pixel-stat-card" style="text-align: left; font-size: 0.7rem; line-height: 1.6;">
-            <div>• <strong>Language:</strong> Modern C++20</div>
+            <div>• <strong>Host:</strong> 127.0.0.1:7878</div>
             <div>• <strong>Workers:</strong> 4 Threads</div>
-            <div>• <strong>Queue Size:</strong> 64 Slots</div>
+            <div>• <strong>Queue Size:</strong> 64 Capacity</div>
             <div>• <strong>Static Root:</strong> ./public</div>
             <div>• <strong>Timeouts:</strong> 5s Read / Write</div>
           </div>
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
             <div class="pixel-toggle-group">
-              <div id="telemetry-toggle" class="pixel-toggle">
+              <div id="telemetry-toggle" class="pixel-toggle" title="Toggle periodic health pinging">
                 <div class="pixel-toggle-knob"></div>
               </div>
-              <span id="telemetry-toggle-label" style="font-size: 0.7rem; font-weight: 700;">ON</span>
+              <span id="telemetry-toggle-label" style="font-size: 0.7rem; font-weight: 700;">AUTO-POLL: ON</span>
             </div>
-            <button class="btn-pixel btn-pixel-secondary" id="system-ok-btn" style="padding: 4px 10px; font-size: 0.7rem;">OK</button>
+            <button class="btn-pixel btn-pixel-secondary" id="system-ok-btn" style="padding: 4px 10px; font-size: 0.7rem;">Ping</button>
           </div>
         </div>
       </div>
@@ -93,7 +93,7 @@
       <!-- Window 2: File Explorer & Assets -->
       <div class="pixel-window">
         <div class="pixel-titlebar">
-          <span>Explorer - /public</span>
+          <span>Static Root - ./public</span>
           <div class="pixel-title-controls">
             <button class="pixel-window-btn">_</button>
             <button class="pixel-window-btn">□</button>
@@ -123,7 +123,7 @@
         </div>
       </div>
 
-      <!-- Window 3: Notice Dialog Box (Matching Template) -->
+      <!-- Window 3: Diagnostics Notice Dialog Box -->
       <div class="pixel-notice-box">
         <!-- Pixel Warning Triangle -->
         <svg class="pixel-warn-triangle" viewBox="0 0 24 24" shape-rendering="crispEdges">
@@ -132,17 +132,18 @@
           <path d="M11 9h2v6h-2zm0 8h2v2h-2z" fill="#000000"/>
         </svg>
         <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
-          <div style="font-size: 0.75rem; font-weight: 700;">Notice: Ready for traffic</div>
+          <div style="font-size: 0.75rem; font-weight: 700;">Diagnostic: Server Active</div>
+          <div style="font-size: 0.65rem; color: #555;">4 workers ready, 0 queue drops.</div>
           <div style="display: flex; gap: 8px;">
-            <button class="btn-pixel btn-pixel-secondary" id="notice-yes-btn" style="padding: 4px 10px; font-size: 0.7rem; border: 2px dotted #000;">Yes</button>
-            <button class="btn-pixel btn-pixel-secondary" id="notice-no-btn" style="padding: 4px 10px; font-size: 0.7rem;">No</button>
+            <button class="btn-pixel btn-pixel-secondary" id="notice-check-btn" style="padding: 4px 10px; font-size: 0.7rem; border: 2px dotted #000;">Check</button>
+            <button class="btn-pixel btn-pixel-secondary" id="notice-console-btn" style="padding: 4px 10px; font-size: 0.7rem;">Console</button>
           </div>
         </div>
       </div>
 
-      <!-- Pixel Speech Bubble Tooltip (Matching Template) -->
+      <!-- Speech Bubble Tip -->
       <div class="pixel-speech-bubble">
-        <strong>Tip:</strong> When the 64-capacity bounded queue is full, Farloom responds with <code>503 Service Unavailable</code> + <code>Retry-After: 1</code>!
+        <strong>Overload Protection:</strong> When the 64-slot queue fills up, Farloom immediately returns <code>503 Service Unavailable</code> with <code>Retry-After: 1</code>.
       </div>
 
     </div>
@@ -152,7 +153,7 @@
       
       <!-- Main Window Titlebar -->
       <div class="pixel-titlebar">
-        <span>Farloom Server Workstation - [Active Session]</span>
+        <span>Farloom Server Manager - [127.0.0.1:7878]</span>
         <div class="pixel-title-controls">
           <button class="pixel-window-btn" title="Minimize">_</button>
           <button class="pixel-window-btn" title="Maximize">□</button>
@@ -160,30 +161,30 @@
         </div>
       </div>
 
-      <!-- Classic Menu Bar (File, Edit, View, Help) -->
+      <!-- Menu Bar (File, Edit, View, Help) -->
       <div class="pixel-menubar">
         <div class="pixel-menu-item">
           File
           <div class="pixel-menu-dropdown">
             <div class="pixel-dropdown-row" id="menu-new-req"><span>New Request</span><span style="color:#666;">Ctrl+N</span></div>
-            <div class="pixel-dropdown-row" id="menu-save-log"><span>Save Log</span><span style="color:#666;">Ctrl+S</span></div>
-            <div class="pixel-dropdown-row disabled"><span>Exit</span></div>
+            <div class="pixel-dropdown-row" id="menu-save-log"><span>Copy Output</span><span style="color:#666;">Ctrl+C</span></div>
+            <div class="pixel-dropdown-row disabled"><span>Shutdown (SIGINT)</span></div>
           </div>
         </div>
         <div class="pixel-menu-item">
           Edit
           <div class="pixel-menu-dropdown">
             <div class="pixel-dropdown-row" id="menu-copy-res"><span>Copy Response</span><span style="color:#666;">Ctrl+C</span></div>
-            <div class="pixel-dropdown-row" id="menu-clear-all"><span>Clear Form</span></div>
+            <div class="pixel-dropdown-row" id="menu-clear-all"><span>Clear Terminal</span></div>
           </div>
         </div>
         <div class="pixel-menu-item">
           View
           <div class="pixel-menu-dropdown">
-            <div class="pixel-dropdown-row nav-link" data-tab="tab-monitor"><span>Overview & Architecture</span></div>
+            <div class="pixel-dropdown-row nav-link" data-tab="tab-monitor"><span>Architecture & Stats</span></div>
             <div class="pixel-dropdown-row nav-link" data-tab="tab-api"><span>API Console</span></div>
             <div class="pixel-dropdown-row nav-link" data-tab="tab-stress"><span>Stress Tester</span></div>
-            <div class="pixel-dropdown-row nav-link" data-tab="tab-security"><span>Security Lab</span></div>
+            <div class="pixel-dropdown-row nav-link" data-tab="tab-security"><span>Security Sandbox</span></div>
           </div>
         </div>
         <div class="pixel-menu-item">
@@ -198,7 +199,7 @@
       <!-- Navigation Tab Buttons Strip -->
       <div class="pixel-tabs-strip">
         <button class="pixel-tab-btn active" data-tab="tab-monitor">
-          🖥 Monitor
+          🖥 Overview
         </button>
         <button class="pixel-tab-btn" data-tab="tab-api">
           ⚡ API Console
@@ -207,7 +208,7 @@
           ⏱ Stress Tester
         </button>
         <button class="pixel-tab-btn" data-tab="tab-security">
-          🛡 Security Lab
+          🛡 Security Sandbox
         </button>
       </div>
 
@@ -216,11 +217,11 @@
         <!-- Telemetry Row -->
         <div class="pixel-metric-strip">
           <div class="pixel-stat-card">
-            <div class="pixel-stat-label">Server Port</div>
+            <div class="pixel-stat-label">Listening Port</div>
             <div class="pixel-stat-val" style="color: var(--pixel-blue-primary);">7878</div>
           </div>
           <div class="pixel-stat-card">
-            <div class="pixel-stat-label">Live Ping</div>
+            <div class="pixel-stat-label">Heartbeat Ping</div>
             <div class="pixel-stat-val" id="metric-ping-val">-- ms</div>
           </div>
           <div class="pixel-stat-card">
@@ -228,7 +229,7 @@
             <div class="pixel-stat-val" id="metric-pings-count">0</div>
           </div>
           <div class="pixel-stat-card">
-            <div class="pixel-stat-label">Requests Sent</div>
+            <div class="pixel-stat-label">Requests Handled</div>
             <div class="pixel-stat-val" id="metric-reqs-count" style="color: var(--pixel-green-dark);">0</div>
           </div>
         </div>
@@ -236,8 +237,8 @@
         <!-- Architecture Flow -->
         <div style="background: #fff; border: 2px solid #000; box-shadow: inset 1px 1px 0 var(--pixel-surface-dark); padding: 1rem;">
           <div style="font-size: 0.8rem; font-weight: 700; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;">
-            <span class="pixel-badge pixel-badge-blue">ARCHITECTURE</span>
-            POSIX Multithreaded Core Pipeline
+            <span class="pixel-badge pixel-badge-blue">CORE PIPELINE</span>
+            POSIX Multithreaded Request Lifecycle
           </div>
 
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; text-align: center;">
@@ -264,14 +265,14 @@
           </div>
         </div>
 
-        <!-- Button Styles Gallery from Template Image -->
+        <!-- Quick Server Actions (Replaces Template Button Showcase) -->
         <div style="background: var(--pixel-window-bg); border: 2px solid #000; padding: 1rem; box-shadow: inset 1px 1px 0 #fff;">
-          <div style="font-size: 0.75rem; font-weight: 700; margin-bottom: 0.75rem;">Button Styles Pack (From Design Spec):</div>
+          <div style="font-size: 0.75rem; font-weight: 700; margin-bottom: 0.75rem;">Quick Server Actions:</div>
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="btn-pixel btn-pixel-primary">Primary Button</button>
-            <button class="btn-pixel btn-pixel-secondary">Secondary Button</button>
-            <button class="btn-pixel btn-pixel-disabled" disabled>Disabled Button</button>
-            <button class="btn-pixel btn-pixel-danger">Danger Button</button>
+            <button class="btn-pixel btn-pixel-primary quick-action-btn" data-preset="health">⚡ Health Ping (/health)</button>
+            <button class="btn-pixel btn-pixel-secondary quick-action-btn" data-preset="echoJson">🔁 Echo Test (/api/echo)</button>
+            <button class="btn-pixel btn-pixel-secondary quick-action-btn" data-preset="static">📄 Fetch Static Index</button>
+            <button class="btn-pixel btn-pixel-danger quick-action-btn" data-preset="traversal">🛡 Security Probe</button>
           </div>
         </div>
       </div>
@@ -281,7 +282,7 @@
         
         <!-- Presets Row -->
         <div>
-          <div style="font-size: 0.7rem; font-weight: 700; margin-bottom: 4px;">Quick Presets:</div>
+          <div style="font-size: 0.7rem; font-weight: 700; margin-bottom: 4px;">Request Presets:</div>
           <div style="display: flex; gap: 6px; flex-wrap: wrap;">
             <span class="pixel-chip" data-preset="health">GET /health</span>
             <span class="pixel-chip" data-preset="echoJson">POST /api/echo (JSON)</span>
@@ -313,7 +314,7 @@
         <!-- Body Input -->
         <div>
           <div style="font-size: 0.7rem; font-weight: 700; margin-bottom: 4px;">Body (POST / PUT):</div>
-          <textarea id="api-body" class="pixel-inset-box" style="width: 100%; height: 80px;">{"message": "Hello from Farloom Pixel UI", "mode": "C++20"}</textarea>
+          <textarea id="api-body" class="pixel-inset-box" style="width: 100%; height: 80px;">{"message": "Hello from Farloom C++20", "status": "active"}</textarea>
         </div>
 
         <!-- Buttons Row -->
@@ -373,7 +374,7 @@
           </div>
         </div>
 
-        <!-- Classic Windows Segmented Progress Bar (Matching Template) -->
+        <!-- Segmented Progress Bar -->
         <div>
           <div style="display: flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 4px;">
             <span>Progress:</span>
@@ -413,7 +414,7 @@
       <div id="tab-security" class="pixel-window-body tab-panel">
         
         <div style="font-size: 0.75rem; line-height: 1.4;">
-          <strong>Interactive Path-Traversal & Protocol Defense Sandbox</strong><br>
+          <strong>Path-Traversal & Protocol Defense Sandbox</strong><br>
           Click any vector to simulate an attack against Farloom's POSIX security controls.
         </div>
 
@@ -479,63 +480,41 @@
 
   </div>
 
-  <!-- Bottom Retro Palette & Pixel Icon Bar (Matching Design Template) -->
+  <!-- Bottom Server Metadata & Status Tray -->
   <footer class="pixel-footer">
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <span style="font-weight: 700;">16-COLOR PALETTE:</span>
-      <!-- 16 color squares -->
-      <div style="display: flex; gap: 3px; border: 1px solid #000; padding: 2px; background: #fff;">
-        <span style="display:inline-block; width:12px; height:12px; background:#000000;"></span>
-        <span style="display:inline-block; width:12px; height:12px; background:#505050;"></span>
-        <span style="display:inline-block; width:12px; height:12px; background:#828282;"></span>
-        <span style="display:inline-block; width:12px; height:12px; background:#c0beba;"></span>
-        <span style="display:inline-block; width:12px; height:12px; background:#ffffff;"></span>
-        <span style="display:inline-block; width:12px; height:12px; background:#163c96;"></span>
-        <span style="display:inline-block; width:12px; height:12px; background:#2458c8;"></span>
-        <span style="display:inline-block; width:12px; height:12px; background:#3d72e6;"></span>
-        <span style="display:inline-block; width:12px; height:12px; background:#208040;"></span>
-        <span style="display:inline-block; width:12px; height:12px; background:#38b764;"></span>
-        <span style="display:inline-block; width:12px; height:12px; background:#f8c822;"></span>
-        <span style="display:inline-block; width:12px; height:12px; background:#fff9b8;"></span>
-        <span style="display:inline-block; width:12px; height:12px; background:#e64c4c;"></span>
-        <span style="display:inline-block; width:12px; height:12px; background:#cf3636;"></span>
-        <span style="display:inline-block; width:12px; height:12px; background:#6b3fa0;"></span>
-        <span style="display:inline-block; width:12px; height:12px; background:#9c78d6;"></span>
-      </div>
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.75rem;">
+      <span style="font-weight: 700;">FARLOOM C++20</span>
+      <span style="color: #888;">·</span>
+      <span>POSIX Networking</span>
+      <span style="color: #888;">·</span>
+      <span>4 Workers</span>
+      <span style="color: #888;">·</span>
+      <span>64 Queue Slots</span>
+      <span style="color: #888;">·</span>
+      <span>Zero External Frameworks</span>
     </div>
 
-    <!-- Pixel Icons Tray (Matching image: Cursors, Hourglass, Folder, Document, Floppy, Heart, Trash) -->
+    <!-- Status Tray Icons -->
     <div style="display: flex; align-items: center; gap: 12px;">
-      <!-- Cursor Arrow -->
-      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges">
+      <!-- Cursor -->
+      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges" title="Interactive">
         <path d="M1 1v13l4-4 3 6 2-1-3-6h5L1 1z" fill="#000"/>
         <path d="M2 3v9l3-3 3 6 1-.5-3-6h4L2 3z" fill="#fff"/>
       </svg>
       <!-- Hourglass -->
-      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges">
+      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges" title="Timeouts: 5s">
         <path d="M2 1h12v2l-4 4v2l4 4v2H2v-2l4-4V7L2 3V1z" fill="#000"/>
         <path d="M4 2h8v1L8 7 4 3V2zm4 7l4 4v1H4v-1l4-4z" fill="#fff"/>
       </svg>
-      <!-- Folder -->
-      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges">
-        <path d="M1 2h5l2 2h7v9H1z" fill="#f8c822"/>
-        <path d="M1 2h5l2 2h7v9H1V2m-1-1v12h16V3H7L5 1H0z" fill="#000"/>
-      </svg>
       <!-- Floppy Disk -->
-      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges">
+      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges" title="Static Files">
         <path d="M2 1h10l3 3v11H2z" fill="#2458c8"/>
         <path d="M4 1h7v4H4zm1 7h7v6H5z" fill="#fff"/>
         <path d="M2 1h10l3 3v11H2V1m-1-1v16h16V3.5L12.5 0H1z" fill="#000"/>
       </svg>
       <!-- Heart -->
-      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges">
+      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges" title="Health: OK">
         <path d="M3 2h3v2H3zm7 0h3v2h-3zM1 4h7v2H1zm8 0h7v2H9zM1 6h14v2H1zm2 2h12v2H3zm2 2h8v2H5zm2 2h4v2H7zm1 2h2v2H8z" fill="#cf3636"/>
-      </svg>
-      <!-- Trash Can -->
-      <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges">
-        <path d="M4 3h8v11H4zm-2-2h12v2H2zm3-1h6v1H5z" fill="#c0beba"/>
-        <path d="M4 3h8v11H4V3m-1-1v13h10V2H3zm-2-1h14v2H1V1m4-1h6v1H5V0z" fill="#000"/>
-        <path d="M6 5h1v7H6zm3 0h1v7H9z" fill="#888"/>
       </svg>
     </div>
   </footer>
