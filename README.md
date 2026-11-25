@@ -9,6 +9,12 @@ One acceptor thread receives incoming TCP connections and hands them to a fixed-
 ## Features
 
 - **Static file serving** (GET only) with `index.html` directory indexing and automatic MIME type mapping by file extension.
+- **Interactive Web Dashboard & Control Plane**:
+  - Live heartbeat telemetry with auto-poll toggle and millisecond ping monitoring (`GET /health`).
+  - Interactive API console for testing methods (`GET`, `POST`, `PUT`, `DELETE`), custom headers, request bodies, and wire response inspection.
+  - In-browser concurrency & stress testing simulator with live segmented progress display, throughput (`req/s`), and average latency calculation.
+  - Interactive security sandbox for executing live path-traversal attacks and verifying mitigations.
+  - Self-contained zero-dependency retro workstation UI served directly out of `./public`.
 - **Strict path-traversal security**:
   - Raw and percent-encoded `..`, backslashes (`\`), NUL bytes (`\0`), drive letters / colons (`:`), and leading `//` are rejected before filesystem resolution.
   - Resolved candidate paths must strictly canonicalize component-wise inside the configured static root.
@@ -40,7 +46,10 @@ farloom-C-plus-plus/
 ├── CHECKLIST.md                # Feature parity & migration checklist
 ├── BENCHMARK.md                # Comparative benchmark report (C++ vs Rust)
 ├── .gitignore                  # Git ignore rules
-├── public/                     # Static web assets (index.html, style.css)
+├── public/                     # Static web assets & interactive dashboard
+│   ├── index.html              # Server Manager dashboard UI
+│   ├── style.css               # Retro workstation CSS design system
+│   └── app.js                  # Telemetry, API console, & load test engine
 ├── include/
 │   ├── result.hpp              # Type-safe Result<T, E> error handling
 │   ├── reader.hpp              # Buffered I/O stream reader abstraction
@@ -175,6 +184,26 @@ Exit codes:
 ---
 
 ## Trying It Out
+
+### 1. Web Dashboard & Control Plane
+
+When the server is running, open **`http://127.0.0.1:7878/`** in your web browser:
+
+```bash
+# macOS
+open http://127.0.0.1:7878/
+
+# Linux
+xdg-open http://127.0.0.1:7878/
+```
+
+The interactive workstation dashboard provides:
+- **Server Overview**: Real-time heartbeat telemetry, active uptime pings, and an interactive architectural pipeline breakdown.
+- **API Console**: Compose requests, test endpoints (`/health`, `/api/echo`), set custom headers, and inspect wire responses.
+- **Stress Tester**: Fire bursts of concurrent client requests directly from the browser to observe worker contention and queue backpressure with a segmented progress bar.
+- **Security Sandbox**: Run live path-traversal attacks (`/..%2fCMakeLists.txt`, `/%00index.html`, etc.) to verify Farloom's containment defenses.
+
+### 2. CLI & cURL Verification
 
 ```bash
 # 1. Health check
